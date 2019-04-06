@@ -23,7 +23,7 @@ library(raster)
 # INPUT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # Set working directory
-wdir <- "D:/Data/CryoSat-2/study1/"
+wdir <- "D:/Data/CryoSat-2/study1/Data/"
 # Assumes the MRD text files do not have the "." in the middle of the filename: e.g.
 # "SDV_20160302_00000000_0_meters_above_sea_level", instead of "SDV_20160302_00000000_0.0_meters_above_sea_level"
 
@@ -41,7 +41,7 @@ Out_res_text <- "15km"
 
 # Set RIOPS file from http://navigator.oceansdata.ca to use as the extent; this file will be emptied, so it doesn't matter
 # which file you indicate here
-RIOPS_dir <- "D:/Data/CryoSat-2/study1/"
+RIOPS_dir <- "D:/Data/CryoSat-2/study1/Data/"
 RIOPS_file <- "riops_201612_2D.nc"
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End of input
@@ -96,6 +96,7 @@ for(g in 1:length(RIOPS_files)){
 		# mask=FALSE, update=TRUE, updateValue='all', na.rm=TRUE)		# surface temps
 		
 	writeRaster(G_North_PS_rf, filename=paste("GIOPS_snow_",RIOPS_base,"_",Out_res_text,".tif",sep=""), format="GTiff", overwrite=TRUE)
+	writeRaster(G_North_PS_rf, filename=paste("GIOPS_snow_",RIOPS_base,"_",Out_res_text,".nc",sep=""), format="CDF", overwrite=TRUE)
 	# writeRaster(G_North_PS_rf, filename=paste("GIOPS_ice_",RIOPS_base,"_",Out_res_text,".tif",sep=""), format="GTiff", overwrite=TRUE)
 	# writeRaster(G_North_PS_rf, filename=paste("GIOPS_Tsurf_",RIOPS_base,"_",Out_res_text,".tif",sep=""), format="GTiff", overwrite=TRUE)
 

@@ -23,7 +23,7 @@ library(raster)
 # INPUT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # Set working directory
-wdir <- "D:/Data/CryoSat-2/study1/Data/"
+wdir <- "D:/phd/CryoSat-2/study1/data/"
 # Assumes the MRD text files do not have the "." in the middle of the filename: e.g.
 # "SDV_20160302_00000000_0_meters_above_sea_level", instead of "SDV_20160302_00000000_0.0_meters_above_sea_level"
 
@@ -41,7 +41,7 @@ Out_res_text <- "15km"
 
 # Set RIOPS file from http://navigator.oceansdata.ca to use as the extent; this file will be emptied, so it doesn't matter
 # which file you indicate here
-RIOPS_dir <- "D:/Data/CryoSat-2/study1/Data/"
+RIOPS_dir <- "D:/phd/CryoSat-2/study1/data/"
 RIOPS_file <- "riops_201612_2D.nc"
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> End of input

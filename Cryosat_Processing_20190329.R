@@ -52,7 +52,7 @@ C2_files <- dir(pattern = "\\.map$") 	# 2-day 1 km CPOM points
 Can_pol_ster <- CRS("+proj=stere +lat_0=90 +lat_ts=90 +lon_0=-100 +k=0.994 +x_0=2000000 +y_0=2000000 +datum=WGS84 +units=m +no_defs") 
 
 # Set CryoVEx data; data are already combined and projected to Can_pol_ster
-Cvex_dir <- "C:/Users/Torsten/Documents/CIS_DA/Cryosat/CryoVex/2014/York/D4AEMThicknessData"
+Cvex_dir <- "C:/Users/Torsten/Documents/CIS_DA/Cryosat/CryoVex/2014/York/D4AEMThicknessData" #switch for ASIRAS
 Cvex_file <- paste(Cvex_dir,"/","201403_18_19_21_allfinal_CanPolStr.shp",sep="")
 # Cvex_file <- paste(Cvex_dir,"/","201403_26_29_30_01_allfinal_CanPolStr.shp",sep="")
 # Cvex_file <- paste(Cvex_dir,"/","201403_18to01_allfinal_CanPolStr.shp",sep="")
@@ -99,13 +99,13 @@ GIOPS_Ice_file <- "GIOPS_ice_20140319_12p5km.tif"
 # GIOPS_Ice_file <- "GIOPS_ice_20140326_5km.tif"
 
 # Set which to use, RIOPS or GIOPS
-RIOPS_GIOPS <- 1	# 1=RIOPS, 0=GIOPS
+RIOPS_GIOPS <- 0	# 1=RIOPS, 0=GIOPS
 
 # Set point spacing text as per RIOPS or GIOPS files - used in filename for .txt output
-spacing <- "40km"
+spacing <- "15km"
 
 # Set if daily output files should be produced
-dailies <- 1	# 1=yes, 0=no
+dailies <- 0	# 1=yes, 0=no
 
 # For the daily files, set the number of samples that must satisfy >= # ;
 # e.g. number of individual retrievals within each grid
@@ -113,11 +113,11 @@ dailies <- 1	# 1=yes, 0=no
 NumSamples <- 1
 
 # Set MYI snow thickness for month in question (in m) - see table below (values from Andy Ridout at CPOM)
-Hs_Tilling <- 0.2332	# December
-# Hs_Tilling <- 0.3160	# March
+#Hs_Tilling <- 0.2332	# December
+ Hs_Tilling <- 0.3160	# March
 
-Ps_Tilling <- 288.2128/1000	# December
-# Ps_Tilling <- 315.4449/1000		# March
+#Ps_Tilling <- 288.2128/1000	# December
+Ps_Tilling <- 315.4449/1000		# March
 
 # Monthly Arctic-wide snow thickness (m) and density (kg/m^3) used in CPOM retrievals
 # 01    0.2668  287.5529
@@ -193,7 +193,7 @@ if(length(C2ip_files) != 0) {
 								"Valid", "ipSeaIceThick", "ipIceType", "Conf_IceType",
 								"SeaIce_Conc", "CoGq")
 		Ind_pass <- subset(Ind_pass, select = Lat:SeaIce_Conc)				
-		Ind_pass <- subset(Ind_pass, Valid == 1)
+		Ind_pass <- subset(Ind_pass, Valid == 1) #may switch off
 		
 		if(nrow(Ind_pass) != 0) {
 			# Get file name (e.g. cry_NO_20140317T000913.thk)
@@ -246,7 +246,7 @@ if(length(C2ip_files) != 0) {
 							   proj4string = crs("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
 	C2ip_pr <- spTransform(C2ip_ll, Can_pol_ster)
 		# writeOGR(C2ip_pr, wdir, "C2ip_CanPolSter_20140315_0321", driver="ESRI Shapefile",
-				# morphToESRI=TRUE, overwrite_layer=TRUE)
+				# morphToESRI=TRUE, overwrite_layer=TRUE) #for testing without for loop
 		# writeOGR(gg, wdir, "C2ip_CanPolSter_20161231", driver="ESRI Shapefile",
 				# morphToESRI=TRUE, overwrite_layer=TRUE)
 
@@ -290,7 +290,7 @@ if(length(C2fb_files) != 0) {
 			# Column 5 : Longitude
 			# Column 6 : Freeboard [this is radar freeboard]
 			# Column 7 : SLA interpolated at this location
-			# Column 8 : Backscatter
+			# Column 8 : Backscatter #not in this file
 			# Column 9 : Sea Ice Concentration (%)
 			# Column 10 : Sea Ice Type (0:Unset, 1:Open Water, 2:FYI, 3:MYI, 4:Ambigous)
 			# Column 11 : Confidence in Sea Ice Type (0:Not Processed, 1:Computation Failed,
@@ -318,7 +318,7 @@ if(length(C2fb_files) != 0) {
 }
 
 # Get modelled snow and ice values
-RIOPS_snow <- raster(paste(RIOPS_dir,RIOPS_snow_file,sep=""))	
+RIOPS_snow <- raster(paste(RIOPS_dir,RIOPS_snow_file,sep=""))	 #use a dummy riops file
 names(RIOPS_snow) <- "Snow_cm"
 crs(RIOPS_snow) <- Can_pol_ster
 RIOPS_snow_pr <- RIOPS_snow
@@ -337,7 +337,8 @@ crs(GIOPS_ice) <- Can_pol_ster # affirm projection
 names(GIOPS_ice) <- "Ice_m"
 
 
-# Read in CryoVEx files; already combined and projected
+# Read in CryoVEx files; already combined (as .shp) and projected on can pol ster
+#switch for ASIRAS fields; now for York
 if(Use_Cvex == 1) {
 	Cvex_shp <- shapefile(Cvex_file)
 	crs(Cvex_shp) <- Can_pol_ster	# affirm projection
@@ -413,7 +414,7 @@ if(length(C2_files) != 0) {
 	C2_passes_sp_pr_FYI <- subset(C2_passes_sp_pr, C2_passes_sp_pr$osi_saf_ice_type == 2)
 }
 if(length(C2ip_files) != 0) {
-	C2ip_pr_MYI <- subset(C2ip_pr, C2ip_pr$ipIceType == 3)
+	C2ip_pr_MYI <- subset(C2ip_pr, C2ip_pr$ipIceType == 3) #from osisaf
 	C2ip_pr_FYI <- subset(C2ip_pr, C2ip_pr$ipIceType == 2)
 }
 if(length(C2fb_files) != 0) {
@@ -429,15 +430,15 @@ Hs_MYI <- Hs_Tilling
 #
 # Reverse CPOM assumptions to find original radar freeboard
 if(length(C2_files) != 0) {
-	C2_passes_sp_pr_MYI$Fi <- ((C2_passes_sp_pr_MYI$SeaIceThick * (Pw-Pice) - Hs_MYI*Ps)
-							/ Pw) - 0.25*Hs_MYI
+	C2_passes_sp_pr_MYI$Fi <- ((C2_passes_sp_pr_MYI$SeaIceThick * (Pw-Pice) - Hs_MYI*Ps) #check for validity
+							/ Pw) - 0.25*Hs_MYI #adjustment for lower speed in snow , check with vishnu
 }
 if(length(C2ip_files) != 0) {
 	C2ip_pr_MYI$ipFi <- ((C2ip_pr_MYI$ipSeaIceThick * (Pw-Pice) - Hs_MYI*Ps)
 							/ Pw) - 0.25*Hs_MYI
 }
 #							
-# Calculate ice thickness based on new assumptions
+# Calculate ice thickness based on new assumptions: Replacing W99 with riops/giops
 if(length(C2_files) != 0) {
 	Hs_RIOPS_MYI_cm <- C2_passes_sp_pr_MYI$Snow_cm
 	Hs_RIOPS_MYI_m <- Hs_RIOPS_MYI_cm/100
@@ -447,16 +448,16 @@ if(length(C2_files) != 0) {
 	C2_passes_sp_pr_MYI$Ti_RIOPS_DeltaS <- NA 
 }
 if(length(C2ip_files) != 0) {
-	ipHs_RIOPS_MYI_cm <- C2ip_pr_MYI$Snow_cm
+	ipHs_RIOPS_MYI_cm <- C2ip_pr_MYI$Snow_cm #using reversed engineered fb
 	ipHs_RIOPS_MYI_m <- ipHs_RIOPS_MYI_cm/100
 	C2ip_pr_MYI$ipTi_RIOPS <- ((C2ip_pr_MYI$ipFi + 0.25*ipHs_RIOPS_MYI_m) * Pw
-								+ ipHs_RIOPS_MYI_m*Ps)/(Pw-Pice)
+								+ ipHs_RIOPS_MYI_m*Ps)/(Pw-Pice) #hydrostatic using riops snow to calculate ice thickness
 	C2ip_pr_MYI$ipTi_DeltaS <- NA
-	C2ip_pr_MYI$ipTi_RIOPS_DeltaS <- NA
+	C2ip_pr_MYI$ipTi_RIOPS_DeltaS <- NA #no salinity adjustment for myi
 
 }
 if(length(C2fb_files) != 0) {
-	fbHs_RIOPS_MYI_cm <- C2fb_pr_MYI$Snow_cm
+	fbHs_RIOPS_MYI_cm <- C2fb_pr_MYI$Snow_cm #using cpom fb
 	fbHs_RIOPS_MYI_m <- fbHs_RIOPS_MYI_cm/100
 	C2fb_pr_MYI$fbTi <- ((C2fb_pr_MYI$R_freeboard + 0.25*Hs_MYI) * Pw
 								+ Hs_MYI*Ps)/(Pw-Pice)
@@ -819,7 +820,7 @@ names(C2_stack) <- c("C2date", "C2_Ti", "RIOPS_Ti", "OSAF_It", "C2Fr_rev",
 				"fb_Fb", "fbTiDs", "fbTiRs", "fbTiRsDs", "fbRsnow", "fbPntCnt", 
 				"CvexDate", "Cvex_TiHs", "CvexRTi", "CvexRsno", "CvexPCnt")
 	
-GridPoints_all <- rasterToPoints(C2_stack, spatial=TRUE)
+GridPoints_all <- rasterToPoints(C2_stack, spatial=TRUE) #place values at centre of each grid cell
 names(GridPoints_all) <- c("C2date", "C2_Ti", "RIOPS_Ti", "OSAF_It", "C2Fr_rev",
 				"C2TiDs", "C2TiRs", "C2TiDsRs", "RIOPS_Hs", "C2PntCnt",
 				"ip_date", "ip_time", "ip_Ti", "ipR_Ti", "ipOSAFIt",
